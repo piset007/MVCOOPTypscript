@@ -1,5 +1,5 @@
 export class BaseController {
-    async success(res, message, data, status = 200) {
+    static async success(res, message, data, status = 200) {
         const response = {
             status: true,
             message,
@@ -8,7 +8,7 @@ export class BaseController {
         res.status(status).json(response);
     }
 
-    async error(res, message, status = 500) {
+    static async error(res, message, status = 500) {
         const response = {
             status: false,
             message
