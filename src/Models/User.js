@@ -1,30 +1,29 @@
+import e from 'express';
+import { BaseModel } from './BaseModel.js';
 import { db } from '../config/db.js';
 
-export class User {
+export class User extends BaseModel {
     
     constructor(id, name, email) {
+        super('users');
         this.id = id;
         this.name = name;
         this.email = email;
     }
 
-    static fromRow(row) {
-        return new User(row.id, row.name, row.email);
-    }
-
     static async getAll() {
-        const [rows] = await db.query('SELECT * FROM users');
-        return rows.map(User.fromRow);
+        const [rows] = await db.query(BaseModel.list('users'));
+        return rows;
     }
 
     static async getById(id) {
-        const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
-        return rows.length ? User.fromRow(rows[0]) : null;
+        const [rows] = await db.query(BaseModel.getById('users'), [id]);
+        return rows.length ? rows[0] : null;
     }
 
     static async create(name, email) {
         const [result] = await db.query(
-            'INSERT INTO users (name, email) VALUES (?, ?)',
+            BaseModel.create('users', ['name', 'email']),
             [name, email]
         );
         return new User(result.insertId, name, email);
@@ -32,7 +31,23 @@ export class User {
 
     static async update(id, name, email) {
         const [result] = await db.query(
-            'UPDATE users SET name = ?, email = ? WHERE id = ?',
+            BaseModel.update('users', ['name', 'email']),
+            [name, email, id]
+        );
+        return result.affectedRows > 0;
+    }
+
+    static async delete(id) {
+        const [result] = await db.query(
+            BaseModel.delete('users'),
+            [id]
+        );
+        return result.affectedRows > 0;
+    }
+
+    static async update(id, name, email) {
+        const [result] = await db.query(
+            BaseModel.update('users', ['name', 'email']),
             [name, email, id]
         );
         if (result.affectedRows === 0) return null;
@@ -40,7 +55,7 @@ export class User {
     }
 
     static async delete(id) {
-        const [result] = await db.query('DELETE FROM users WHERE id = ?', [id]);
+        const [result] = await db.query(BaseModel.delete('users'), [id]);
         return result.affectedRows > 0;
     }
 }

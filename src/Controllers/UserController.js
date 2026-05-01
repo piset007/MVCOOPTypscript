@@ -1,24 +1,25 @@
+import { BaseController } from './BaseController.js';
 import { User } from '../Models/User.js';
 
-export class UserController {
+export class UserController extends BaseController {
     async getAllUsers(req, res) {
         try {
             const users = await User.getAll();
-            res.json(users);
+            await this.success(res, 'Users successfuly', users);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            await this.error(res, 'Server Error', 500);
         }
     }
 
     async getUser(req, res) {
         try {
             const user = await User.getById(req.params.id);
-            if (!user) return res.status(404).json({ message: 'User not found' });
-            res.json(user);
+            if (!user) return await this.error(res, 'User not found', 404);
+            await this.success(res, 'User successfully', user);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            await this.error(res, 'Server Error', 500);
         }
     }
 
@@ -26,13 +27,13 @@ export class UserController {
         try {
             const { name, email } = req.body;
             if (!name || !email) {
-                return res.status(400).json({ error: 'name and email are required' });
+                return await this.error(res, 'name and email are required', 400);
             }
             const user = await User.create(name, email);
-            res.status(201).json(user);
+            await this.success(res, 'User created successfully', user, 201);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            await this.error(res, 'Server Error', 500);
         }
     }
 
@@ -40,25 +41,25 @@ export class UserController {
         try {
             const { name, email } = req.body;
             if (!name || !email) {
-                return res.status(400).json({ error: 'name and email are required' });
+                return await this.error(res, 'name and email are required', 400);
             }
             const user = await User.update(req.params.id, name, email);
-            if (!user) return res.status(404).json({ message: 'User not found' });
-            res.json(user);
+            if (!user) return await this.error(res, 'User not found', 404);
+            await this.success(res, 'User updated successfully', user);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            await this.error(res, 'Server Error', 500);
         }
     }
 
     async deleteUser(req, res) {
         try {
             const deleted = await User.delete(req.params.id);
-            if (!deleted) return res.status(404).json({ message: 'User not found' });
-            res.status(204).end();
+            if (!deleted) return await this.error(res, 'User not found', 404);
+            await this.success(res, 'User deleted successfully', { message: 'User deleted successfully' });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Internal Server Error' });
+            await this.error(res, 'Server Error', 500);
         }
     }
 }
