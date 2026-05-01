@@ -1,6 +1,4 @@
-import e from 'express';
 import { BaseModel } from './BaseModel.js';
-import { db } from '../config/db.js';
 
 export class User extends BaseModel {
     
@@ -12,42 +10,25 @@ export class User extends BaseModel {
     }
 
     static async getAll() {
-        const [rows] = await db.query(BaseModel.list('users'));
-        return rows;
+        return await this.query(`SELECT * FROM users`);
     }
 
     static async getById(id) {
-        const [rows] = await db.query(BaseModel.getById('users'), [id]);
+        const rows = await this.query(`SELECT * FROM users WHERE id = ?`, [id]);
         return rows.length ? rows[0] : null;
     }
 
     static async create(name, email) {
-        const [result] = await db.query(
-            BaseModel.create('users', ['name', 'email']),
+        const result = await this.query(
+            `INSERT INTO users (name, email) VALUES (?, ?)`,
             [name, email]
         );
         return new User(result.insertId, name, email);
     }
 
     static async update(id, name, email) {
-        const [result] = await db.query(
-            BaseModel.update('users', ['name', 'email']),
-            [name, email, id]
-        );
-        return result.affectedRows > 0;
-    }
-
-    static async delete(id) {
-        const [result] = await db.query(
-            BaseModel.delete('users'),
-            [id]
-        );
-        return result.affectedRows > 0;
-    }
-
-    static async update(id, name, email) {
-        const [result] = await db.query(
-            BaseModel.update('users', ['name', 'email']),
+        const result = await this.query(
+            `UPDATE users SET name = ?, email = ? WHERE id = ?`,
             [name, email, id]
         );
         if (result.affectedRows === 0) return null;
@@ -55,7 +36,7 @@ export class User extends BaseModel {
     }
 
     static async delete(id) {
-        const [result] = await db.query(BaseModel.delete('users'), [id]);
+        const result = await this.query( `DELETE FROM users WHERE id = ?`, [id] );
         return result.affectedRows > 0;
     }
 }
