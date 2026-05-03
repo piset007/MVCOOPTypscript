@@ -1,18 +1,16 @@
 export class BaseController {
     static async success(res, message, data, status = 200) {
-        const response = {
+        res.status(status).json({ 
             status: true,
-            message,
-            data
-        };
-        res.status(status).json(response);
+            message, 
+            data 
+        });
     }
 
     static async error(res, message, status = 500) {
-        const response = {
+        res.status(status).json({ 
             status: false,
-            message
-        };
-        res.status(status).json(response);
+            message 
+        });
     }
 }
