@@ -6,9 +6,6 @@ const pool = mysql2.createPool({
     user: 'root',
     password: '',
     database: 'project_test_db',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
 });
 
 export { pool as db };
